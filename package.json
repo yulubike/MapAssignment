@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/yulubike/MapAssignment/issues"
   },
-  "homepage": "https://github.com/yulubike/MapAssignment#readme"
+  "homepage": "https://github.com/yulubike/MapAssignment#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "totoro-node": "^1.1.5"
+  }
 }
