@@ -1,0 +1,22 @@
+{
+  "name": "mapassignmentname",
+  "version": "1.0.0",
+  "description": "assignemnt for interviews",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yulubike/MapAssignment.git"
+  },
+  "keywords": [
+    "map"
+  ],
+  "author": "Subhadeep Pal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yulubike/MapAssignment/issues"
+  },
+  "homepage": "https://github.com/yulubike/MapAssignment#readme"
+}
