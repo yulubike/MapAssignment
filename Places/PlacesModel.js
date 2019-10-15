@@ -5,6 +5,7 @@ var placesSchema =  new Schema({
     title: String,
     latitude: Number,
     longitude: Number,
-    description: String
+    description: String,
+    image: String
  }); 
 module.exports = mongoose.model('places', placesSchema);

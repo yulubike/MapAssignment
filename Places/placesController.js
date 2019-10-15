@@ -1,5 +1,6 @@
 var Place = require('./PlacesModel');
 var dbConnection = require('../DatabaseConnection/dbConnection');
+var fs = require('fs');
 
 function getAllPlaces(apiVersion, req, res, next) {
     Place.find(function(err, response){
@@ -22,6 +23,17 @@ function getPlaceWithId(apiVersion, req, res, next) {
 
 function createPlace(apiVersion, req, res, next) {
     var placesInfo = req.body; //Get the parsed information
+    var image = req.files;
+    if(image) {
+        if(image.image.mimetype != 'image/jpeg')
+            return res.status(400).send({"error":"File should be image jepg"});
+        if(image.image.size > 500000)
+            return res.status(400).send({"error":"File should be lesser than 500kb"});
+            image.image.mv('/Users/deep/Development/UploadedImages'+image.image.tempFilePath+'.jpg', function(err) {
+            if (err)
+              return res.status(500).send(err);
+        });
+    }
     if(!placesInfo.title || !placesInfo.latitude || !placesInfo.longitude){
         res.status(400).send({"error":"Params Missing"});
      } else {
@@ -31,6 +43,8 @@ function createPlace(apiVersion, req, res, next) {
            longitude: placesInfo.longitude,
            description: placesInfo.description
         });
+        if(image)
+            place.image = image.image.tempFilePath;
         if (!dbConnection.createObject(place, Place)) {
             res.status(200).send(place);
         } else {

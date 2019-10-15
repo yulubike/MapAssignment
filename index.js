@@ -6,6 +6,7 @@ var bodyParser = require('body-parser')
 
 var controller = require('./Places/placesController');
 var dbConnection = require('./DatabaseConnection/dbConnection');
+var fileUpload = require('express-fileupload');
 
 dbConnection.connectdb()
 
@@ -13,6 +14,11 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json())
+app.use(fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+    useTempFiles : true,
+    tempFileDir : '/tmp/'
+  }));
 
 app.use('/api', totoro.rain({
     v1: { // this is an API version definition
