@@ -2,8 +2,17 @@ var express = require('express')
 var app = express();
 
 var totoro = require('totoro-node');
+var bodyParser = require('body-parser')
 
 var controller = require('./Places/placesController');
+var dbConnection = require('./DatabaseConnection/dbConnection');
+
+dbConnection.connectdb()
+
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json())
 
 app.use('/api', totoro.rain({
     v1: { // this is an API version definition
@@ -11,25 +20,32 @@ app.use('/api', totoro.rain({
         deprecated: false, // this parameter are optional but the default value is false when not specified
         endpoints: [
             {
-                route: "/test/endpoint",
+                route: "/places",
                 method: "GET",
                 active: true, // this parameter are optional but the default value is true when not specified
                 deprecated: false, // this parameter are optional but the default value is false when not specified
-                implementation: controller.dummy
+                implementation: controller.getAllPlaces
             },
             {
-                route: "/another/test/endpoint",
-                method: "POST",
-                implementation: controller.dummy
-            }
-        ]
-    },
-    v2: {
-        endpoints: [
-            {
-                route: "/test/endpoint",
+                route: "/places/:id",
                 method: "GET",
-                implementation: controller.dummy
+                active: true, // this parameter are optional but the default value is true when not specified
+                deprecated: false, // this parameter are optional but the default value is false when not specified
+                implementation: controller.getPlaceWithId
+            },
+            {
+                route: "/places",
+                method: "POST",
+                active: true, // this parameter are optional but the default value is true when not specified
+                deprecated: false, // this parameter are optional but the default value is false when not specified
+                implementation: controller.createPlace
+            },
+            {
+                route: "/places",
+                method: "PUT",
+                active: true, // this parameter are optional but the default value is true when not specified
+                deprecated: false, // this parameter are optional but the default value is false when not specified
+                implementation: controller.updatePlaceWithId
             }
         ]
     }
