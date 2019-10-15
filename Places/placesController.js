@@ -40,9 +40,12 @@ function createPlace(apiVersion, req, res, next) {
 }
 
 function updatePlaceWithId(apiVersion, req, res, next) {
-    res.status(200).send({
-        "apiVersion": apiVersion,
-        "request": req.params
+    Place.findByIdAndUpdate(req.params.id, req.body, 
+        function(err, response){
+            if (!err)
+                res.status(200).send(response);
+            else
+                res.status(400).send({"error":"Failed to save, check data type" + err});
     });
 }
 module.exports = {

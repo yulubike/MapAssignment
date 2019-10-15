@@ -41,7 +41,7 @@ app.use('/api', totoro.rain({
                 implementation: controller.createPlace
             },
             {
-                route: "/places",
+                route: "/places/:id",
                 method: "PUT",
                 active: true, // this parameter are optional but the default value is true when not specified
                 deprecated: false, // this parameter are optional but the default value is false when not specified
