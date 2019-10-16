@@ -56,7 +56,23 @@ async function createPlace(apiVersion, req, res, next) {
     }
 }
 
-function updatePlaceWithId(apiVersion, req, res, next) {
+async function updatePlaceWithId(apiVersion, req, res, next) {
+    var image = req.files;
+    var savingName;
+    if (image) {
+        if (image.image.mimetype != 'image/jpeg')
+            return res.status(400).send({ "error": "File should be image jepg" });
+        if (image.image.size > 500000)
+            return res.status(400).send({ "error": "File should be lesser than 500kb" });
+
+        try {
+            savingName = await moveFile(image, makeid(16));
+        } catch(e) {
+            return res.status(500).send(e);
+        }
+    }
+    if (savingName)
+        req.body.image = savingName;
     Place.findByIdAndUpdate(req.params.id, req.body,
         function (err, response) {
             if (!err)
