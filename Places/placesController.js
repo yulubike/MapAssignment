@@ -1,13 +1,17 @@
 var Place = require('./PlacesModel');
 var dbConnection = require('../DatabaseConnection/dbConnection');
+var serialize = require('express-serializer');
+var placeSerializer = require('./placesSerializer');
 var fs = require('fs');
 
 function getAllPlaces(apiVersion, req, res, next) {
     Place.find(function (err, response) {
         if (!err)
-            res.status(200).send(response);
+            serialize(req, response, placeSerializer.serializePlaceShort).then(json => {
+                res.status(200).send(json);
+            }).catch(next);
         else
-            res.status(400).send({ "error": "Failed to save, check data type" + err });
+            res.status(400).send({ "error": "Failed to fetch data from db" + err });
     });
 
 }
@@ -15,9 +19,11 @@ function getAllPlaces(apiVersion, req, res, next) {
 function getPlaceWithId(apiVersion, req, res, next) {
     Place.findById(req.params.id, function (err, response) {
         if (!err)
-            res.status(200).send(response);
+            serialize(req, response, placeSerializer.serializePlace).then(json => {
+                res.status(200).send(json);
+            }).catch(next);
         else
-            res.status(400).send({ "error": "Failed to save, check data type" + err });
+            res.status(400).send({ "error": "Failed to fetch data from db" + err });
     });
 }
 
@@ -33,7 +39,7 @@ async function createPlace(apiVersion, req, res, next) {
 
         try {
             savingName = await moveFile(image, makeid(16));
-        } catch(e) {
+        } catch (e) {
             return res.status(500).send(e);
         }
     }
@@ -49,9 +55,11 @@ async function createPlace(apiVersion, req, res, next) {
         if (savingName)
             place.image = savingName;
         if (!dbConnection.createObject(place, Place)) {
-            res.status(200).send(place);
+            serialize(req, place, placeSerializer.serializePlace).then(json => {
+                return res.status(200).send(json);
+            }).catch(next);
         } else {
-            res.status(400).send({ "error": "Failed to save, check data type" });
+            return res.status(400).send({ "error": "Failed to save, check data type" });
         }
     }
 }
@@ -67,7 +75,7 @@ async function updatePlaceWithId(apiVersion, req, res, next) {
 
         try {
             savingName = await moveFile(image, makeid(16));
-        } catch(e) {
+        } catch (e) {
             return res.status(500).send(e);
         }
     }
@@ -76,7 +84,9 @@ async function updatePlaceWithId(apiVersion, req, res, next) {
     Place.findByIdAndUpdate(req.params.id, req.body,
         function (err, response) {
             if (!err)
-                res.status(200).send(response);
+                serialize(req, response, placeSerializer.serializePlace).then(json => {
+                    res.status(200).send(json);
+                }).catch(next);
             else
                 res.status(400).send({ "error": "Failed to save, check data type" + err });
         });
@@ -99,15 +109,15 @@ function moveFile(file, savingName) {
 }
 
 function makeid(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
- }
- 
+}
+
 
 
 module.exports = {
