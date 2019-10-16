@@ -43,9 +43,11 @@ async function createPlace(apiVersion, req, res, next) {
             return res.status(500).send(e);
         }
     }
-    if (!placesInfo.title || !placesInfo.latitude || !placesInfo.longitude) {
-        res.status(400).send({ "error": "Params Missing" });
-    } else {
+    if (!placesInfo.title || !placesInfo.latitude || !placesInfo.longitude)
+        return res.status(400).send({ "error": "Params Missing" });
+    else if (placesInfo.latitude > 90 || placesInfo.latitude < -90 || placesInfo.longitude > 180 || placesInfo.longitude < -180)
+        return res.status(400).send({ "error": "Lat & long are outside range" });
+    else {
         var place = new Place({
             title: placesInfo.title,
             latitude: placesInfo.latitude,
