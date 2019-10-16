@@ -18,6 +18,8 @@ function getAllPlaces(apiVersion, req, res, next) {
 
 function getPlaceWithId(apiVersion, req, res, next) {
     Place.findById(req.params.id, function (err, response) {
+        if (err == null && response == null)
+            return res.status(400).send({ "error": "Id is incorrect " + err });
         if (!err)
             serialize(req, response, placeSerializer.serializePlace).then(json => {
                 res.status(200).send(json);
@@ -29,6 +31,10 @@ function getPlaceWithId(apiVersion, req, res, next) {
 
 async function createPlace(apiVersion, req, res, next) {
     var placesInfo = req.body; //Get the parsed information
+    if (!placesInfo.title || !placesInfo.latitude || !placesInfo.longitude)
+        return res.status(400).send({ "error": "Params Missing" });
+    else if (placesInfo.latitude > 90 || placesInfo.latitude < -90 || placesInfo.longitude > 180 || placesInfo.longitude < -180)
+        return res.status(400).send({ "error": "Lat & long are outside range" });
     var image = req.files;
     var savingName;
     if (image) {
@@ -43,28 +49,27 @@ async function createPlace(apiVersion, req, res, next) {
             return res.status(500).send(e);
         }
     }
-    if (!placesInfo.title || !placesInfo.latitude || !placesInfo.longitude) {
-        res.status(400).send({ "error": "Params Missing" });
+    var place = new Place({
+        title: placesInfo.title,
+        latitude: placesInfo.latitude,
+        longitude: placesInfo.longitude,
+        description: placesInfo.description
+    });
+    if (savingName)
+        place.image = savingName;
+    if (!dbConnection.createObject(place, Place)) {
+        serialize(req, place, placeSerializer.serializePlace).then(json => {
+            return res.status(200).send(json);
+        }).catch(next);
     } else {
-        var place = new Place({
-            title: placesInfo.title,
-            latitude: placesInfo.latitude,
-            longitude: placesInfo.longitude,
-            description: placesInfo.description
-        });
-        if (savingName)
-            place.image = savingName;
-        if (!dbConnection.createObject(place, Place)) {
-            serialize(req, place, placeSerializer.serializePlace).then(json => {
-                return res.status(200).send(json);
-            }).catch(next);
-        } else {
-            return res.status(400).send({ "error": "Failed to save, check data type" });
-        }
+        return res.status(400).send({ "error": "Failed to save, check data type" });
     }
 }
 
 async function updatePlaceWithId(apiVersion, req, res, next) {
+    if (!req.body.latitude || !req.body.longitude)
+        if (req.body.latitude > 90 || req.body.latitude < -90 || req.body.longitude > 180 || req.body.longitude < -180)
+            return res.status(400).send({ "error": "Lat & long are outside range" });
     var image = req.files;
     var savingName;
     if (image) {
@@ -83,12 +88,14 @@ async function updatePlaceWithId(apiVersion, req, res, next) {
         req.body.image = savingName;
     Place.findByIdAndUpdate(req.params.id, req.body,
         function (err, response) {
-            if (!err)
+            if (err == null && response == null)
+                return res.status(400).send({ "error": "Id is incorrect " + err });
+            if (!err) {
                 serialize(req, response, placeSerializer.serializePlace).then(json => {
                     res.status(200).send(json);
-                }).catch(next);
+                }).catch(next);}
             else
-                res.status(400).send({ "error": "Failed to save, check data type" + err });
+                res.status(400).send({ "error": "Failed to save, check data type or check Id |||||| " + err });
         });
 }
 
