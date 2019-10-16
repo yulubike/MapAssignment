@@ -24,6 +24,7 @@ function getPlaceWithId(apiVersion, req, res, next) {
 async function createPlace(apiVersion, req, res, next) {
     var placesInfo = req.body; //Get the parsed information
     var image = req.files;
+    var savingName;
     if (image) {
         if (image.image.mimetype != 'image/jpeg')
             return res.status(400).send({ "error": "File should be image jepg" });
@@ -31,7 +32,7 @@ async function createPlace(apiVersion, req, res, next) {
             return res.status(400).send({ "error": "File should be lesser than 500kb" });
 
         try {
-            await moveFile(image);
+            savingName = await moveFile(image, makeid(16));
         } catch(e) {
             return res.status(500).send(e);
         }
@@ -45,8 +46,8 @@ async function createPlace(apiVersion, req, res, next) {
             longitude: placesInfo.longitude,
             description: placesInfo.description
         });
-        if (image)
-            place.image = image.image.tempFilePath;
+        if (savingName)
+            place.image = savingName;
         if (!dbConnection.createObject(place, Place)) {
             res.status(200).send(place);
         } else {
@@ -65,22 +66,38 @@ function updatePlaceWithId(apiVersion, req, res, next) {
         });
 }
 
+function getImage(apiVersion, req, res, next) {
+    return res.sendFile('/Users/deep/Development/UploadedImages/' + req.params.file_name + '.jpg');
+}
 
-function moveFile(file) {
+
+function moveFile(file, savingName) {
     return new Promise((res, rej) => {
-        file.image.mv('/Users/deep/Development/UploadedImages' + file.image.tempFilePath + '.jpg', function (err) {
+        file.image.mv('/Users/deep/Development/UploadedImages/' + savingName + '.jpg', function (err) {
             if (err)
                 rej(err);
             else
-                res();
+                res(savingName);
         });
     })
 }
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+ }
+ 
 
 
 module.exports = {
     getAllPlaces,
     getPlaceWithId,
     createPlace,
-    updatePlaceWithId
+    updatePlaceWithId,
+    getImage
 }

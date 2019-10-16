@@ -52,6 +52,13 @@ app.use('/api', totoro.rain({
                 active: true, // this parameter are optional but the default value is true when not specified
                 deprecated: false, // this parameter are optional but the default value is false when not specified
                 implementation: controller.updatePlaceWithId
+            },
+            {
+                route: "/image/:file_name",
+                method: "GET",
+                active: true, // this parameter are optional but the default value is true when not specified
+                deprecated: false, // this parameter are optional but the default value is false when not specified
+                implementation: controller.getImage
             }
         ]
     }
