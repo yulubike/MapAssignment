@@ -67,6 +67,6 @@ app.use('/api', totoro.rain({
 app.get('*', function(req, res){
     res.send('Sorry, this is an invalid URL.');
  });
-app.listen(3000);
+app.listen(80);
 //when uploading to cloud
 //app.listen(port, [host], [backlog], [callback]])
