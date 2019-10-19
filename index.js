@@ -4,7 +4,8 @@ var app = express();
 var totoro = require('totoro-node');
 var bodyParser = require('body-parser')
 
-var controller = require('./Places/placesController');
+var placesController = require('./Places/placesController');
+var placesControllerV2 = require('./Places/v2/placesController');
 var dbConnection = require('./DatabaseConnection/dbConnection');
 var fileUpload = require('express-fileupload');
 
@@ -30,35 +31,48 @@ app.use('/api', totoro.rain({
                 method: "GET",
                 active: true, // this parameter are optional but the default value is true when not specified
                 deprecated: false, // this parameter are optional but the default value is false when not specified
-                implementation: controller.getAllPlaces
+                implementation: placesController.getAllPlaces
             },
             {
                 route: "/places/:id",
                 method: "GET",
                 active: true, // this parameter are optional but the default value is true when not specified
                 deprecated: false, // this parameter are optional but the default value is false when not specified
-                implementation: controller.getPlaceWithId
+                implementation: placesController.getPlaceWithId
             },
             {
                 route: "/places",
                 method: "POST",
                 active: true, // this parameter are optional but the default value is true when not specified
                 deprecated: false, // this parameter are optional but the default value is false when not specified
-                implementation: controller.createPlace
+                implementation: placesController.createPlace
             },
             {
                 route: "/places/:id",
                 method: "PUT",
                 active: true, // this parameter are optional but the default value is true when not specified
                 deprecated: false, // this parameter are optional but the default value is false when not specified
-                implementation: controller.updatePlaceWithId
+                implementation: placesController.updatePlaceWithId
             },
             {
                 route: "/image/:file_name",
                 method: "GET",
                 active: true, // this parameter are optional but the default value is true when not specified
                 deprecated: false, // this parameter are optional but the default value is false when not specified
-                implementation: controller.getImage
+                implementation: placesController.getImage
+            }
+        ]
+    },
+    v2: {
+        active: true, // this parameter are optional but the default value is true when not specified
+        deprecated: false, // this parameter are optional but the default value is false when not specified
+        endpoints: [
+            {
+                route: "/places",
+                method: "GET",
+                active: true, // this parameter are optional but the default value is true when not specified
+                deprecated: false, // this parameter are optional but the default value is false when not specified
+                implementation: placesControllerV2.getAllPlaces
             }
         ]
     }
