@@ -72,7 +72,7 @@ async function updatePlaceWithId(apiVersion, req, res, next) {
     if (!req.body.latitude || !req.body.longitude)
         if (req.body.latitude > 90 || req.body.latitude < -90 || req.body.longitude > 180 || req.body.longitude < -180)
             return res.status(400).send({ "error": "Lat & long are outside range" });
-    if (placesInfo.image)
+    if (req.body.image)
         return res.status(400).send({ "error": "Image needs to be sent as multipart form upload" });
     var image = req.files;
     var savingName;
