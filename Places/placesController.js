@@ -33,6 +33,8 @@ async function createPlace(apiVersion, req, res, next) {
     var placesInfo = req.body; //Get the parsed information
     if (!placesInfo.title || !placesInfo.latitude || !placesInfo.longitude)
         return res.status(400).send({ "error": "Params Missing" });
+    if (placesInfo.image)
+        return res.status(400).send({ "error": "Image needs to be sent as multipart form upload" });
     else if (placesInfo.latitude > 90 || placesInfo.latitude < -90 || placesInfo.longitude > 180 || placesInfo.longitude < -180)
         return res.status(400).send({ "error": "Lat & long are outside range" });
     var image = req.files;
@@ -70,6 +72,8 @@ async function updatePlaceWithId(apiVersion, req, res, next) {
     if (!req.body.latitude || !req.body.longitude)
         if (req.body.latitude > 90 || req.body.latitude < -90 || req.body.longitude > 180 || req.body.longitude < -180)
             return res.status(400).send({ "error": "Lat & long are outside range" });
+    if (placesInfo.image)
+        return res.status(400).send({ "error": "Image needs to be sent as multipart form upload" });
     var image = req.files;
     var savingName;
     if (image) {
